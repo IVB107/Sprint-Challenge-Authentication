@@ -11,6 +11,22 @@ module.exports = server => {
   server.get('/api/jokes', authenticate, getJokes);
 };
 
+// ----- HANDLERS -----
+
+const find = () => {
+  return db('users').select('id', 'username', 'password');
+}
+
+const findBy = filter => {
+  return db('users').where(filter);
+}
+
+const findById = id => {
+  return db('users')
+  .where({ id })
+  .first();
+}
+
 const add = async user => {
   const [id] = await db('users').insert(user);
   
@@ -28,6 +44,8 @@ const generateToken = user => {
   return jwt.sign(payload, jwtKey, options);
 }
 
+// ----- CRUDs -----
+
 // POST --> /api/register
 const register = (req, res) => {
   // implement user registration
@@ -36,10 +54,11 @@ const register = (req, res) => {
 
   add(user)
     .then(saved => {
-      const token = generateToken(saved);
+      // Use token here if react client routes from /api/register to /api/users
+      // const token = generateToken(saved);
       res.status(201).json({
-        message: `Welcome, ${saved.username}!`,
-        token
+        message: `Welcome, ${saved.username}! Please Login.`,
+        // token
       })
     })
     .catch(err => {
@@ -51,6 +70,27 @@ const register = (req, res) => {
 // POST --> /api/login
 const login = (req, res) => {
   // implement user login
+  let { username, password } = req.body;
+
+  findBy({ username })
+    .first()
+    .then(user => {
+      if (user && bcrypt.compareSync(password, user.password)){
+        const token = generateToken(user);
+
+        res.status(200).json({
+          message: `Welcome back, ${user.username}!`,
+          token
+        })
+      } else {
+        res.status(401).json({ message: 'Invalid Credentials.' });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    })
+
 }
 
 // GET --> /api/jokes
