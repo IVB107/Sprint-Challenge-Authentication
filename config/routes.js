@@ -1,6 +1,9 @@
 const axios = require('axios');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-const { authenticate } = require('../auth/authenticate');
+const db = require('../database/dbConfig');
+const { authenticate, jwtKey } = require('../auth/authenticate');
 
 module.exports = server => {
   server.post('/api/register', register);
@@ -8,15 +11,50 @@ module.exports = server => {
   server.get('/api/jokes', authenticate, getJokes);
 };
 
-function register(req, res) {
-  // implement user registration
+const add = async user => {
+  const [id] = await db('users').insert(user);
+  
+  return findById(id);
 }
 
-function login(req, res) {
+const generateToken = user => {
+  const payload = {
+    subject: user.id, 
+    password: user.password
+  }
+  const options = {
+    expiresIn: '2h'
+  }
+  return jwt.sign(payload, jwtKey, options);
+}
+
+// POST --> /api/register
+const register = (req, res) => {
+  // implement user registration
+  let user = req.body;
+  user.password = bcrypt.hashSync(user.password, 8);
+
+  add(user)
+    .then(saved => {
+      const token = generateToken(saved);
+      res.status(201).json({
+        message: `Welcome, ${saved.username}!`,
+        token
+      })
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    })
+}
+
+// POST --> /api/login
+const login = (req, res) => {
   // implement user login
 }
 
-function getJokes(req, res) {
+// GET --> /api/jokes
+const getJokes = (req, res) => {
   const requestOptions = {
     headers: { accept: 'application/json' },
   };
