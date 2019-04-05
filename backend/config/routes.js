@@ -55,10 +55,10 @@ const register = (req, res) => {
   add(user)
     .then(saved => {
       // Use token here if react client routes from /api/register to /api/users
-      // const token = generateToken(saved);
+      const token = generateToken(saved);
       res.status(201).json({
         message: `Welcome, ${saved.username}! Please Login.`,
-        // token
+        token
       })
     })
     .catch(err => {
