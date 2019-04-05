@@ -17,7 +17,7 @@ class Register extends Component {
             <input 
               value={this.state.username}
               onChange={this.handleInputChange}
-              name="username"
+              id="username"
               type="text"
               placeholder="username"
             />
@@ -27,13 +27,13 @@ class Register extends Component {
             <input 
               value={this.state.password}
               onChange={this.handleInputChange}
-              name="password"
-              type="text"
+              id="password"
+              type="password"
               placeholder="password"
             />
           </div>
           <div>
-            <button type="submit"></button>
+            <button type="submit">Sign Up!</button>
           </div>
         </form>
       </div>
@@ -55,8 +55,8 @@ class Register extends Component {
       .post(endpoint, this.state)
       .then(res => {
         console.log(res);
-        localStorage.setItem('token, res.data.token');
-        this.props.history.push('/users');
+        localStorage.setItem('token', res.data.token);
+        this.props.history.push('/jokes');
       })
       .catch(err => {
         console.log('Registration Error: ', err);

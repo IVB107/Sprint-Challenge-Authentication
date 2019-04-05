@@ -12,11 +12,16 @@ class Jokes extends Component {
     return (
       <div>
         <h2>Dad Jokes:</h2>
-        <div>
+        <ol>
           {this.state.jokes.map(joke => {
-            return <div key={joke.id} >{joke}</div>
-          })}
-        </div>
+              return (
+                <div key={joke.id}>
+                  <p>{joke.joke}</p>
+                </div>
+              )
+            })
+          }
+        </ol>
       </div>
     )
   }

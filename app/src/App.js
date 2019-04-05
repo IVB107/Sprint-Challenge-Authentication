@@ -30,7 +30,13 @@ class App extends Component {
     );
   }
 
+  handleLogout = () => {
+    localStorage.removeItem('token');
+    this.props.history.push('/');
+  }
+
 }
+
 
 const Home = () => {
   return <h1>CAUTION: Dad Jokes Incoming...</h1>
